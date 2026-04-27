@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Q2 Survival Analysis Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 950px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.7;
+    }
+    h1, h2 {
+      color: #222;
+    }
+    code {
+      background: #f2f2f2;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Q2 Survival Analysis Report</h1>
+
+  <h2>1. Dataset and Task</h2>
+  <p>
+    This analysis uses the IBM Telco Customer Churn dataset. Each row represents one customer.
+    The goal is to analyze how long customers stay with the company and what factors may affect customer churn risk.
+  </p>
+
+  <h2>2. Survival Analysis Setup</h2>
+  <p>
+    In this case, the duration variable is <code>tenure</code>, which measures the number of months a customer has stayed with the company.
+    The event variable is <code>Churn</code>. If Churn is Yes, event is coded as 1. If Churn is No, event is coded as 0, meaning the observation is right-censored.
+  </p>
+
+  <h2>3. Data Cleaning</h2>
+  <p>
+    The analysis keeps month-to-month customers and removes customers without internet service.
+    After cleaning, the dataset contains 3351 customers, including 1556 churned customers and 1795 censored customers.
+  </p>
+
+  <h2>4. Exploratory Results</h2>
+  <p>
+    The cleaned sample has a churn rate of about 46.43%. Fiber optic customers show a higher churn rate than DSL customers.
+    Customers using Electronic check also show a higher churn rate than customers using automatic payment methods.
+  </p>
+
+  <h2>5. Kaplan-Meier Survival Curve</h2>
+  <p>
+    The Kaplan-Meier analysis shows that customer survival probability decreases as tenure increases.
+    The estimated median survival time is about 34 months.
+  </p>
+
+  <h2>6. Log-rank Test</h2>
+  <p>
+    The gender groups do not show a statistically significant survival difference.
+    However, OnlineSecurity shows a strong survival difference. Customers with OnlineSecurity have higher survival probability and lower churn risk.
+  </p>
+
+  <h2>7. Cox Model and AFT Model</h2>
+  <p>
+    The Cox model suggests that OnlineBackup and TechSupport are associated with lower churn risk,
+    while Fiber optic internet service is associated with higher churn risk.
+    The AFT model provides another perspective by directly modeling customer retention time.
+  </p>
+
+  <h2>8. Customer Lifetime Value</h2>
+  <p>
+    Survival probabilities can be used to calculate customer lifetime value. In this project,
+    the 60-month cumulative NPV is estimated as 982.10 under the given assumptions.
+  </p>
+
+  <h2>9. Conclusion</h2>
+  <p>
+    Survival analysis is more informative than a simple churn classification task because it answers not only whether a customer may churn,
+    but also when the churn may happen. In this case, service features, payment method, and internet service type are closely related to customer retention.
+  </p>
+
+  <p><a href="index.html">Back to homepage</a></p>
+</body>
+</html>
