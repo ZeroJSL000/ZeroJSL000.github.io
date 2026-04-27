@@ -506,8 +506,17 @@
         </p>
 
         <figure class="figure">
-          <img src="images/eda.png" alt="Exploratory data analysis tables">
-          <figcaption>Figure 3. Event 分布、duration 描述统计以及关键变量分组 churn rate。</figcaption>
+          <img src="images/eda.png" alt="Event distribution and duration descriptive statistics">
+          <figcaption>
+            Figure 3. Event 分布与 duration 描述统计。清洗后的样本中，event=0 的客户有 1795 人，event=1 的客户有 1556 人；duration 的中位数为 13 个月，均值约为 19.43 个月。
+          </figcaption>
+        </figure>
+      
+        <figure class="figure">
+          <img src="images/eda1.png" alt="Grouped churn rate by InternetService, PaymentMethod, and OnlineSecurity">
+          <figcaption>
+            Figure 4. 按 InternetService、PaymentMethod 和 OnlineSecurity 分组的 churn rate 与平均 duration。结果显示，Fiber optic、Electronic check、未开通 OnlineSecurity 的客户流失率更高。
+          </figcaption>
         </figure>
       </section>
 
@@ -525,7 +534,7 @@
 
         <figure class="figure">
           <img src="images/km_population.png" alt="Kaplan-Meier survival curve">
-          <figcaption>Figure 4. Overall Kaplan-Meier survival curve.</figcaption>
+          <figcaption>Figure 5. Overall Kaplan-Meier survival curve.</figcaption>
         </figure>
       </section>
 
@@ -548,7 +557,7 @@
 
         <figure class="figure">
           <img src="images/km_groups.png" alt="Grouped Kaplan-Meier curves and log-rank test">
-          <figcaption>Figure 5. Kaplan-Meier curves by gender and OnlineSecurity, with log-rank test results.</figcaption>
+          <figcaption>Figure 6. Kaplan-Meier curves by gender and OnlineSecurity, with log-rank test results.</figcaption>
         </figure>
       </section>
 
@@ -576,7 +585,7 @@
 
         <figure class="figure">
           <img src="images/cox_model.png" alt="Cox model hazard ratios">
-          <figcaption>Figure 6. Cox model hazard ratios and proportional hazards assumption check.</figcaption>
+          <figcaption>Figure 7. Cox model hazard ratios and proportional hazards assumption check.</figcaption>
         </figure>
       </section>
 
@@ -594,7 +603,7 @@
 
         <figure class="figure">
           <img src="images/aft_model.png" alt="AFT model output">
-          <figcaption>Figure 7. Log-Logistic AFT model output.</figcaption>
+          <figcaption>Figure 8. Log-Logistic AFT model output.</figcaption>
         </figure>
       </section>
 
@@ -617,7 +626,7 @@
 
         <figure class="figure">
           <img src="images/clv.png" alt="Customer lifetime value curve">
-          <figcaption>Figure 8. Survival-based customer lifetime value calculation.</figcaption>
+          <figcaption>Figure 9. Survival-based customer lifetime value calculation.</figcaption>
         </figure>
       </section>
 
