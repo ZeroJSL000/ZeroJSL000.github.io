@@ -1,84 +1,650 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Q2 Survival Analysis Report</title>
   <style>
+    :root {
+      --bg: #08111f;
+      --panel: rgba(255,255,255,0.075);
+      --panel-2: rgba(255,255,255,0.115);
+      --border: rgba(255,255,255,0.14);
+      --text: #edf3ff;
+      --muted: #aebbd8;
+      --blue: #71a7ff;
+      --cyan: #64f1e4;
+      --purple: #b79cff;
+      --pink: #ff8fb3;
+      --green: #7df0b9;
+      --yellow: #ffd166;
+      --code: #101827;
+    }
+
+    * {
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      max-width: 950px;
-      margin: 40px auto;
-      padding: 0 20px;
-      line-height: 1.7;
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(100, 241, 228, 0.18), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(183, 156, 255, 0.22), transparent 30%),
+        linear-gradient(135deg, #070b16 0%, #101a2e 48%, #071320 100%);
+      line-height: 1.75;
     }
-    h1, h2 {
-      color: #222;
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
+      opacity: 0.6;
+      z-index: 0;
     }
+
+    a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .layout {
+      width: min(1240px, calc(100% - 36px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 28px;
+      position: relative;
+      z-index: 1;
+      padding: 28px 0 80px;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 22px;
+      height: calc(100vh - 44px);
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(18px);
+      overflow-y: auto;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+    }
+
+    .sidebar h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      letter-spacing: 0.3px;
+    }
+
+    .sidebar .small {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .toc {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .toc a {
+      color: var(--muted);
+      padding: 9px 10px;
+      border-radius: 13px;
+      font-size: 14px;
+      transition: 0.18s ease;
+    }
+
+    .toc a:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.09);
+      text-decoration: none;
+    }
+
+    .back {
+      display: inline-flex;
+      margin-top: 18px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--text);
+      background: rgba(255,255,255,0.06);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .content {
+      min-width: 0;
+    }
+
+    .hero {
+      border: 1px solid var(--border);
+      border-radius: 34px;
+      padding: 40px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.13), rgba(255,255,255,0.05)),
+        radial-gradient(circle at top right, rgba(100,241,228,0.13), transparent 36%);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 30px 100px rgba(0,0,0,0.30);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(100,241,228,0.4), transparent 66%);
+      filter: blur(8px);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(100,241,228,0.35);
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(100,241,228,0.08);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 6vw, 70px);
+      line-height: 0.98;
+      letter-spacing: -2.4px;
+    }
+
+    .gradient {
+      background: linear-gradient(90deg, #fff, #9ceaff 42%, #c4b5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      max-width: 820px;
+      color: var(--muted);
+      font-size: 18px;
+      margin: 24px 0 0;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 22px 0 0;
+    }
+
+    .stat {
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      background: rgba(7, 13, 28, 0.62);
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .stat .value {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+    }
+
+    section {
+      margin-top: 24px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: rgba(255,255,255,0.072);
+      backdrop-filter: blur(16px);
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    }
+
+    section h2 {
+      margin: 0 0 14px;
+      font-size: 28px;
+      letter-spacing: -0.9px;
+    }
+
+    section p {
+      margin: 12px 0;
+      color: #dce5ff;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .callout {
+      margin: 18px 0;
+      padding: 18px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(100,241,228,0.25);
+      background: rgba(100,241,228,0.075);
+    }
+
+    .callout strong {
+      color: var(--cyan);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .mini-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(10,18,34,0.63);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .mini-card h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .mini-card p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .figure {
+      margin: 20px 0;
+      padding: 14px;
+      border-radius: 24px;
+      background: rgba(4, 9, 20, 0.62);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .figure img {
+      display: block;
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #fff;
+    }
+
+    .figure figcaption {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
     code {
-      background: #f2f2f2;
-      padding: 2px 4px;
-      border-radius: 4px;
+      padding: 2px 6px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.1);
+      color: #d9f99d;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    ul {
+      color: #dce5ff;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    .result-list strong {
+      color: var(--green);
+    }
+
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      padding-bottom: 20px;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: relative;
+        height: auto;
+      }
+      .toc {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .stats, .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        padding: 28px;
+      }
+      section {
+        padding: 24px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Q2 Survival Analysis Report</h1>
+  <div class="layout">
+    <aside class="sidebar">
+      <h3>Q2 Survival Analysis</h3>
+      <div class="small">IBM Telco Customer Churn Dataset</div>
+      <nav class="toc">
+        <a href="#task">1. 任务说明与数据集</a>
+        <a href="#definition">2. 生存分析变量定义</a>
+        <a href="#cleaning">3. 数据清洗过程</a>
+        <a href="#eda">4. 探索性分析结果</a>
+        <a href="#km">5. Kaplan-Meier 生存曲线</a>
+        <a href="#logrank">6. 分组曲线与 Log-rank Test</a>
+        <a href="#cox">7. Cox 模型</a>
+        <a href="#aft">8. AFT 模型</a>
+        <a href="#clv">9. Customer Lifetime Value</a>
+        <a href="#summary">10. 小结</a>
+      </nav>
+      <a class="back" href="index.html">← Back to Homepage</a>
+    </aside>
 
-  <h2>1. Dataset and Task</h2>
-  <p>
-    This analysis uses the IBM Telco Customer Churn dataset. Each row represents one customer.
-    The goal is to analyze how long customers stay with the company and what factors may affect customer churn risk.
-  </p>
+    <main class="content">
+      <header class="hero">
+        <div class="tag">Project 1 · Q2(2) Blog Report</div>
+        <h1>
+          Survival Analysis<br>
+          <span class="gradient">Customer Churn Report</span>
+        </h1>
+        <p>
+          本页面展示 Q2(2) 的 survival analysis 报告。分析对象是 IBM Telco Customer Churn 数据集，
+          重点解释客户从开始订阅服务到流失之间的时间，以及不同客户特征和服务变量如何影响流失风险。
+        </p>
 
-  <h2>2. Survival Analysis Setup</h2>
-  <p>
-    In this case, the duration variable is <code>tenure</code>, which measures the number of months a customer has stayed with the company.
-    The event variable is <code>Churn</code>. If Churn is Yes, event is coded as 1. If Churn is No, event is coded as 0, meaning the observation is right-censored.
-  </p>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Original Rows</div>
+            <div class="value">7,043</div>
+          </div>
+          <div class="stat">
+            <div class="label">Cleaned Rows</div>
+            <div class="value">3,351</div>
+          </div>
+          <div class="stat">
+            <div class="label">Churned</div>
+            <div class="value">1,556</div>
+          </div>
+          <div class="stat">
+            <div class="label">Median Survival</div>
+            <div class="value">34 mo</div>
+          </div>
+        </div>
+      </header>
 
-  <h2>3. Data Cleaning</h2>
-  <p>
-    The analysis keeps month-to-month customers and removes customers without internet service.
-    After cleaning, the dataset contains 3351 customers, including 1556 churned customers and 1795 censored customers.
-  </p>
+      <section id="task">
+        <h2>1. 任务说明与数据集</h2>
+        <p>
+          本题使用的是 IBM Telco Customer Churn 数据集。这个数据集的每一行代表一个电信公司的客户，
+          包含客户的基本信息、服务类型、付款方式、月消费金额、总消费金额以及是否流失等字段。本题的目标是用
+          survival analysis 分析客户从开始订阅服务到流失之间的时间，并进一步观察哪些因素可能影响客户流失风险。
+        </p>
+        <p>
+          本次分析在服务器上完成，并参考了 Databricks 官方 survival analysis casebook 的整体流程。
+          由于官方代码中包含一些 Databricks 专用语法，例如 <code>dbutils</code>、DBFS 和 Delta Lake，
+          因此我在自己的 notebook 中改写成了普通服务器环境可以运行的 PySpark、pandas、lifelines 和 matplotlib 代码。
+          最终所有代码整理在一个 <code>q2_survival_analysis.ipynb</code> 文件中。
+        </p>
+        <p>
+          原始数据共有 7043 行和 21 列。主要字段包括 <code>customerID</code>、<code>gender</code>、
+          <code>tenure</code>、<code>InternetService</code>、<code>OnlineSecurity</code>、
+          <code>TechSupport</code>、<code>PaymentMethod</code>、<code>MonthlyCharges</code>、
+          <code>TotalCharges</code> 和 <code>Churn</code> 等。
+        </p>
 
-  <h2>4. Exploratory Results</h2>
-  <p>
-    The cleaned sample has a churn rate of about 46.43%. Fiber optic customers show a higher churn rate than DSL customers.
-    Customers using Electronic check also show a higher churn rate than customers using automatic payment methods.
-  </p>
+        <figure class="figure">
+          <img src="images/schema.png" alt="Original schema and dataset preview">
+          <figcaption>Figure 1. 原始数据 schema 与数据预览。</figcaption>
+        </figure>
+      </section>
 
-  <h2>5. Kaplan-Meier Survival Curve</h2>
-  <p>
-    The Kaplan-Meier analysis shows that customer survival probability decreases as tenure increases.
-    The estimated median survival time is about 34 months.
-  </p>
+      <section id="definition">
+        <h2>2. 生存分析变量定义</h2>
+        <p>
+          在这个案例中，生存分析的对象是电信客户。每个客户被看作一个观察个体，分析的核心是客户能在公司服务中留存多长时间。
+        </p>
 
-  <h2>6. Log-rank Test</h2>
-  <p>
-    The gender groups do not show a statistically significant survival difference.
-    However, OnlineSecurity shows a strong survival difference. Customers with OnlineSecurity have higher survival probability and lower churn risk.
-  </p>
+        <div class="grid-2">
+          <div class="mini-card">
+            <h3>Duration</h3>
+            <p><code>duration = tenure</code>，表示客户已经使用服务的月份数，因此可以作为生存时间。</p>
+          </div>
+          <div class="mini-card">
+            <h3>Event</h3>
+            <p><code>event = Churn</code>。如果 Churn = Yes，则 event 记为 1；如果 Churn = No，则 event 记为 0。</p>
+          </div>
+        </div>
 
-  <h2>7. Cox Model and AFT Model</h2>
-  <p>
-    The Cox model suggests that OnlineBackup and TechSupport are associated with lower churn risk,
-    while Fiber optic internet service is associated with higher churn risk.
-    The AFT model provides another perspective by directly modeling customer retention time.
-  </p>
+        <p>
+          其中，<code>tenure</code> 表示客户已经使用服务的月份数，因此可以作为生存时间。
+          <code>Churn</code> 表示客户是否已经流失。如果 <code>Churn = Yes</code>，则 event 记为 1，
+          表示流失事件已经发生；如果 <code>Churn = No</code>，则 event 记为 0，表示观察结束时客户仍未流失。
+          这类样本在生存分析中属于右删失样本，我们只知道他们在当前观察期内还没有流失，但不能认为他们以后永远不会流失。
+        </p>
+        <p>
+          这个设定和传统分类任务不太一样。普通分类模型通常只关注“是否流失”，而 survival analysis 还关注“什么时候流失”。
+        </p>
+      </section>
 
-  <h2>8. Customer Lifetime Value</h2>
-  <p>
-    Survival probabilities can be used to calculate customer lifetime value. In this project,
-    the 60-month cumulative NPV is estimated as 982.10 under the given assumptions.
-  </p>
+      <section id="cleaning">
+        <h2>3. 数据清洗过程</h2>
+        <p>数据读取后，我先对原始字段进行了处理。主要清洗步骤如下：</p>
+        <ul>
+          <li>将 <code>Churn</code> 从 Yes/No 转换成 <code>event</code> 变量，Yes 记为 1，No 记为 0。</li>
+          <li>将 <code>tenure</code> 作为 <code>duration</code>，表示客户留存月份数。</li>
+          <li>只保留 <code>Contract = Month-to-month</code> 的客户。</li>
+          <li>去除 <code>InternetService = No</code> 的客户。</li>
+          <li>将 <code>TotalCharges</code> 从字符串转换为数值变量，方便后续导入 MySQL 和进一步分析。</li>
+          <li>创建 Spark SQL 临时视图，方便同时使用 Spark DataFrame API 和 Spark SQL API 进行统计。</li>
+        </ul>
 
-  <h2>9. Conclusion</h2>
-  <p>
-    Survival analysis is more informative than a simple churn classification task because it answers not only whether a customer may churn,
-    but also when the churn may happen. In this case, service features, payment method, and internet service type are closely related to customer retention.
-  </p>
+        <div class="callout">
+          <strong>清洗后样本：</strong>
+          清洗后的数据共有 3351 行。选择月付客户是因为这类客户更容易发生流失，适合进行 churn survival analysis；
+          同时去掉没有互联网服务的客户，是为了让 <code>OnlineSecurity</code>、<code>OnlineBackup</code>、
+          <code>TechSupport</code> 等互联网服务相关变量有实际解释意义。
+        </div>
 
-  <p><a href="index.html">Back to homepage</a></p>
+        <figure class="figure">
+          <img src="images/cleaning.png" alt="Data cleaning output">
+          <figcaption>Figure 2. 清洗后样本与关键字段预览。</figcaption>
+        </figure>
+      </section>
+
+      <section id="eda">
+        <h2>4. 探索性分析结果</h2>
+        <p>
+          清洗后的样本中，流失客户比例约为 46.43%。这个比例不低，说明月付互联网服务客户确实是一个比较容易流失的群体。
+          从 <code>duration</code> 的结果看，客户留存时长差异很大。中位数是 13 个月，均值是 19.43 个月，
+          说明有一部分客户留存时间较长，把平均值拉高了。
+        </p>
+        <p>
+          我还按几个关键变量计算了 churn rate 和平均 duration。结果显示，Fiber optic 用户的 churn rate 为 54.61%，
+          明显高于 DSL 用户的 32.22%。按付款方式看，Electronic check 用户的 churn rate 为 55.08%，高于自动扣款方式。
+          按服务功能看，没有 OnlineSecurity 的用户 churn rate 为 51.05%，有 OnlineSecurity 的用户为 29.58%；
+          没有 TechSupport 的用户 churn rate 为 50.37%，有 TechSupport 的用户为 30.70%。
+        </p>
+        <p>
+          这些结果说明，互联网服务类型、付款方式、安全服务和技术支持都可能和客户流失有关。
+        </p>
+
+        <figure class="figure">
+          <img src="images/eda.png" alt="Exploratory data analysis tables">
+          <figcaption>Figure 3. Event 分布、duration 描述统计以及关键变量分组 churn rate。</figcaption>
+        </figure>
+      </section>
+
+      <section id="km">
+        <h2>5. Kaplan-Meier 生存曲线</h2>
+        <p>
+          接着，我使用 Kaplan-Meier 方法估计整体客户留存曲线。Kaplan-Meier curve 的横轴是 duration，
+          也就是客户留存月份数；纵轴是 survival probability，也就是客户在某个月份之后仍未流失的概率。
+        </p>
+        <p>
+          整体 Kaplan-Meier 曲线显示，随着使用月份增加，客户仍然留存的概率逐渐下降。本次分析得到的总体中位生存时间为 34 个月。
+          这里的 34 个月不是平均流失时间，而是 Kaplan-Meier 曲线估计 survival probability 下降到 0.5 左右的时间点。
+          也就是说，在当前清洗后的月付互联网服务客户中，大约到第 34 个月时，客户继续留存的概率降到一半左右。
+        </p>
+
+        <figure class="figure">
+          <img src="images/km_population.png" alt="Kaplan-Meier survival curve">
+          <figcaption>Figure 4. Overall Kaplan-Meier survival curve.</figcaption>
+        </figure>
+      </section>
+
+      <section id="logrank">
+        <h2>6. 分组生存曲线与 Log-rank Test</h2>
+        <p>
+          为了比较不同客户群体之间的留存差异，我分别画了 gender 和 OnlineSecurity 的分组 Kaplan-Meier 曲线，
+          并使用 log-rank test 检验组间差异。
+        </p>
+        <p>
+          gender 分组的 log-rank test p-value 为 0.153。这个值大于 0.05，说明在当前样本下，
+          没有足够证据认为男性和女性客户的生存曲线存在显著差异。也就是说，gender 对客户留存的影响并不明显。
+        </p>
+        <p>
+          OnlineSecurity 分组的 log-rank test p-value 约为 1.19e-32，远小于 0.05。这说明是否开通
+          OnlineSecurity 的客户在生存曲线上存在非常显著的差异。从曲线趋势看，开通 OnlineSecurity 的客户留存概率更高，
+          流失风险更低。这个结果和前面的探索性分析是一致的。没有 OnlineSecurity 的客户 churn rate 更高，
+          Kaplan-Meier 曲线也显示他们的留存情况更差。
+        </p>
+
+        <figure class="figure">
+          <img src="images/km_groups.png" alt="Grouped Kaplan-Meier curves and log-rank test">
+          <figcaption>Figure 5. Kaplan-Meier curves by gender and OnlineSecurity, with log-rank test results.</figcaption>
+        </figure>
+      </section>
+
+      <section id="cox">
+        <h2>7. Cox Proportional Hazards 模型</h2>
+        <p>
+          为了进一步分析多个变量对流失风险的影响，我使用 Cox Proportional Hazards 模型。
+          Cox 模型的核心输出是 hazard ratio，也就是 <code>exp(coef)</code>。
+        </p>
+        <ul class="result-list">
+          <li><strong>hazard ratio &gt; 1：</strong>该变量会提高流失风险。</li>
+          <li><strong>hazard ratio &lt; 1：</strong>该变量会降低流失风险。</li>
+          <li><strong>p-value &lt; 0.05：</strong>该变量在统计上较显著。</li>
+        </ul>
+        <p>
+          从结果看，<code>OnlineBackup_Yes</code> 和 <code>TechSupport_Yes</code> 的 hazard ratio 明显小于 1，
+          说明这两个服务功能和更低的流失风险有关。<code>InternetService_Fiber optic</code> 的 hazard ratio 大于 1，
+          说明 Fiber optic 用户在当前样本中的流失风险更高。这个结果也和前面探索性分析中 Fiber optic 用户 churn rate 较高的发现一致。
+        </p>
+        <p>
+          同时，我也检查了 Cox 模型的比例风险假设。结果显示，
+          <code>InternetService_Fiber optic</code>、<code>OnlineBackup_Yes</code> 和 <code>TechSupport_Yes</code>
+          可能违反 proportional hazards assumption。因此，Cox 模型结果更适合作为探索性解释结果，而不应该被当成唯一的最终预测模型。
+        </p>
+
+        <figure class="figure">
+          <img src="images/cox_model.png" alt="Cox model hazard ratios">
+          <figcaption>Figure 6. Cox model hazard ratios and proportional hazards assumption check.</figcaption>
+        </figure>
+      </section>
+
+      <section id="aft">
+        <h2>8. Accelerated Failure Time 模型</h2>
+        <p>
+          除了 Cox 模型，还使用了 Log-Logistic Accelerated Failure Time model。AFT 模型和 Cox 模型的角度不同。
+          Cox 模型关注变量如何影响风险率，AFT 模型则更直接地建模 time-to-event，也就是客户留存时间。
+        </p>
+        <p>
+          本次 AFT 模型估计的中位生存时间为 24.78 个月。AFT 模型结果可以作为 Cox 模型的补充，
+          帮助我们从留存时间角度理解客户流失问题。比如，一些服务功能可能会延长客户留存时间，
+          而一些付款方式或服务类型可能会缩短客户留存时间。
+        </p>
+
+        <figure class="figure">
+          <img src="images/aft_model.png" alt="AFT model output">
+          <figcaption>Figure 7. Log-Logistic AFT model output.</figcaption>
+        </figure>
+      </section>
+
+      <section id="clv">
+        <h2>9. Customer Lifetime Value 计算</h2>
+        <p>
+          用 Cox 模型预测了一个样本客户的 survival probability，并进一步计算了简单的 customer lifetime value。
+          这里设定：monthly profit = 30，annual discount rate = 10%。
+        </p>
+        <p>
+          计算过程是先根据 survival probability 得到每个月的 expected profit，再考虑折现率计算 discounted expected profit，
+          最后累计得到 cumulative NPV。前 24 个月的结果显示，随着月份增加，survival probability 逐渐下降，
+          因此 expected profit 也逐渐下降。60 个月累计 NPV 为 982.10。
+        </p>
+        <p>
+          这个部分说明 survival analysis 不只是可以用于判断客户是否会流失，还能进一步服务于商业决策。
+          因为客户是否留存会影响未来收益，所以 survival probability 可以被转化成 customer lifetime value，
+          用来辅助客户分层、营销投入和服务策略设计。
+        </p>
+
+        <figure class="figure">
+          <img src="images/clv.png" alt="Customer lifetime value curve">
+          <figcaption>Figure 8. Survival-based customer lifetime value calculation.</figcaption>
+        </figure>
+      </section>
+
+      <section id="summary">
+        <h2>10. 小结</h2>
+        <p>
+          本题使用 IBM Telco Customer Churn 数据集完成了一个完整的 survival analysis 流程。
+          分析对象是电信客户，duration 是客户留存月份数，event 是客户是否流失。
+          清洗后数据共有 3351 个样本，其中 1556 个客户已经流失，1795 个客户在观察结束时仍未流失。
+        </p>
+        <p>
+          Kaplan-Meier 分析显示，总体中位生存时间约为 34 个月。分组曲线和 log-rank test 表明，
+          gender 对客户留存的影响不明显，但 OnlineSecurity 对客户留存有显著影响。
+          Cox 模型进一步显示，OnlineBackup、TechSupport 和 Dependents 与更低的流失风险有关，
+          而 Fiber optic InternetService 和 PaperlessBilling 与更高的流失风险有关。
+          AFT 模型从留存时间角度提供了补充分析，CLV 计算则展示了 survival probability 在客户生命周期价值估计中的应用。
+        </p>
+        <p>
+          整体来看，survival analysis 比普通 churn 分类更适合回答“客户什么时候可能流失”和“哪些因素影响客户留存时间”这类问题。
+          在客户流失分析中，它不仅能用于风险解释，也能进一步支持客户价值评估和运营决策。
+        </p>
+      </section>
+
+      <div class="footer">
+        Built with GitHub Pages · Custom Domain Deployment · Project 1 Q2(4)
+      </div>
+    </main>
+  </div>
 </body>
 </html>
