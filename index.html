@@ -1,12 +1,392 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZeroJSL Project 1</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.14);
+      --text: #eef2ff;
+      --muted: #aab4d4;
+      --blue: #6ea8ff;
+      --cyan: #63e6e2;
+      --purple: #a78bfa;
+      --green: #6ee7b7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(99, 230, 226, 0.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(167, 139, 250, 0.24), transparent 32%),
+        linear-gradient(135deg, #070b16 0%, #11182d 55%, #07111f 100%);
+      overflow-x: hidden;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 34px 0 70px;
+      position: relative;
+      z-index: 1;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+      color: var(--muted);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: 0.3px;
+    }
+
+    .brand-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      box-shadow: 0 0 28px rgba(99, 230, 226, 0.8);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      font-size: 14px;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .hero {
+      margin-top: 76px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 42px;
+      align-items: center;
+    }
+
+    .tag {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 13px;
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(44px, 7vw, 82px);
+      line-height: 0.96;
+      letter-spacing: -3px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #fff, #8ddfff 45%, #c4b5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.75;
+      margin: 28px 0 34px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 800;
+      border: 1px solid var(--card-border);
+      transition: 0.2s ease;
+    }
+
+    .button.primary {
+      color: #06101d;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      box-shadow: 0 12px 34px rgba(99, 230, 226, 0.22);
+    }
+
+    .button.secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .dashboard {
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.32);
+      padding: 24px;
+      backdrop-filter: blur(18px);
+    }
+
+    .mini-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .traffic {
+      display: flex;
+      gap: 7px;
+    }
+
+    .traffic span {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .red { background: #ff6b6b; }
+    .yellow { background: #ffd166; }
+    .green { background: #6ee7b7; }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(10, 18, 34, 0.62);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .metric .value {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .wide {
+      grid-column: span 2;
+    }
+
+    .bar {
+      height: 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: 72%;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      border-radius: inherit;
+    }
+
+    .section {
+      margin-top: 86px;
+    }
+
+    .section h2 {
+      font-size: 34px;
+      letter-spacing: -1px;
+      margin-bottom: 18px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 24px;
+      background: var(--card);
+      backdrop-filter: blur(14px);
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    footer {
+      margin-top: 80px;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 24px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 850px) {
+      .hero {
+        grid-template-columns: 1fr;
+        margin-top: 38px;
+      }
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>ZeroJSL Project 1</h1>
-  <p>This is my GitHub Pages website for Project 1.</p>
-  <p><a href="q2-survival-analysis.html">Q2 Survival Analysis Report</a></p>
+  <div class="noise"></div>
+
+  <main class="container">
+    <nav>
+      <div class="brand">
+        <span class="brand-dot"></span>
+        ZeroJSL Project 1
+      </div>
+      <div class="nav-links">
+        <a href="q2-survival-analysis.html">Survival Analysis</a>
+        <a href="#overview">Overview</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <div class="tag">GitHub Pages · Custom Domain · Data Analysis Blog</div>
+        <h1>
+          Data Analysis<br>
+          <span class="gradient-text">Portfolio Website</span>
+        </h1>
+        <p class="subtitle">
+          This personal website is built for Project 1. It presents the Q2 survival analysis report
+          based on the IBM Telco Customer Churn dataset, including data cleaning, Kaplan-Meier curves,
+          log-rank tests, Cox model, AFT model, and customer lifetime value analysis.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="q2-survival-analysis.html">Read Q2 Report</a>
+          <a class="button secondary" href="https://github.com/ZeroJSL000/ZeroJSL000.github.io">View GitHub Repository</a>
+        </div>
+      </div>
+
+      <div class="dashboard">
+        <div class="mini-header">
+          <div class="traffic"><span class="red"></span><span class="yellow"></span><span class="green"></span></div>
+          <div>Project dashboard</div>
+        </div>
+        <div class="metric-grid">
+          <div class="metric">
+            <div class="label">Cleaned sample</div>
+            <div class="value">3,351</div>
+          </div>
+          <div class="metric">
+            <div class="label">Churn events</div>
+            <div class="value">1,556</div>
+          </div>
+          <div class="metric">
+            <div class="label">Median survival</div>
+            <div class="value">34 mo</div>
+          </div>
+          <div class="metric">
+            <div class="label">60-month NPV</div>
+            <div class="value">982.10</div>
+          </div>
+          <div class="metric wide">
+            <div class="label">Report completion</div>
+            <div class="value">Q2(2) Blog</div>
+            <div class="bar"><span></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="overview">
+      <h2>Website Content</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Survival Setup</h3>
+          <p>Defines customer tenure as duration and churn status as the event variable.</p>
+        </div>
+        <div class="card">
+          <h3>Model Results</h3>
+          <p>Includes Kaplan-Meier estimation, log-rank tests, Cox model, and AFT model.</p>
+        </div>
+        <div class="card">
+          <h3>Business Value</h3>
+          <p>Uses survival probabilities to support customer lifetime value estimation.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Built with GitHub Pages and deployed with a custom domain for Project 1.
+    </footer>
+  </main>
 </body>
 </html>
